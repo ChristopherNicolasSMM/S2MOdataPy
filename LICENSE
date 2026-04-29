@@ -1,0 +1,50 @@
+MIT License with Attribution - S2MOdataPy
+
+Copyright (c) 2024 Christopher N. S. M. Mauricio
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in all
+   copies or substantial portions of the Software.
+
+2. ATTRIBUTION REQUIREMENT:
+   Any use of this Software, whether in original or modified form, MUST include
+   clear and visible attribution to the original author:
+   
+   "Christopher N. S. M. Mauricio - S2MOdataPy (https://github.com/christophermauricio/S2MOdataPy)"
+   
+   This attribution must appear in:
+   - Documentation
+   - About dialogs or credits screens
+   - Command line output (if applicable)
+   - Publicly available derivatives
+
+3. The names "S2MOdataPy" and "Christopher N. S. M. Mauricio" may not be used to
+   endorse or promote products derived from this Software without specific prior
+   written permission.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+ATTRIBUTION EXAMPLES:
+
+In Python code:
+    # S2MOdataPy by Christopher N. S. M. Mauricio
+    from s2modatapy import S2MClient
+
+In Documentation:
+    This software uses S2MOdataPy created by Christopher N. S. M. Mauricio
+
+In Command Line Tools:
+    print("Powered by S2MOdataPy (c) Christopher N. S. M. Mauricio")
