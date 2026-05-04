@@ -50,9 +50,9 @@ class TestListagem:
     def test_campos_esperados_no_cliente(self, http_client):
         resp = http_client.get("/odata/Customers")
         primeiro = resp.json()["value"][0]
-        assert "CustomerID"   in primeiro
-        assert "CompanyName"  in primeiro
-        assert "Country"      in primeiro
+        assert "CustomerID" in primeiro
+        assert "CompanyName" in primeiro
+        assert "Country" in primeiro
 
 
 class TestFiltro:
@@ -140,7 +140,9 @@ class TestPaginacao:
 
     def test_skip_pula_registros(self, http_client):
         todos = http_client.get("/odata/Customers?$orderby=CustomerID asc").json()["value"]
-        pulados = http_client.get("/odata/Customers?$skip=2&$orderby=CustomerID asc").json()["value"]
+        pulados = http_client.get("/odata/Customers?$skip=2&$orderby=CustomerID asc").json()[
+            "value"
+        ]
         assert todos[2]["CustomerID"] == pulados[0]["CustomerID"]
 
     def test_paginacao_combinada(self, http_client):
@@ -175,7 +177,7 @@ class TestPaginacao:
         registros_pagina = len(paginado_resp.json()["value"])
 
         assert total == total_paginado  # O count é o total real
-        assert registros_pagina == 1    # Mas só retornou 1 registro
+        assert registros_pagina == 1  # Mas só retornou 1 registro
 
 
 class TestSelect:
@@ -224,32 +226,19 @@ class TestViaS2MOdataPy:
         assert len(result["value"]) > 0
 
     def test_filter_via_builder(self, odata_client):
-        result = (
-            odata_client.entity("Customers")
-            .filter("Country eq 'Mexico'")
-            .get()
-        )
+        result = odata_client.entity("Customers").filter("Country eq 'Mexico'").get()
         for c in result["value"]:
             assert c["Country"] == "Mexico"
 
     def test_select_via_builder(self, odata_client):
-        result = (
-            odata_client.entity("Customers")
-            .select("CustomerID", "CompanyName")
-            .top(5)
-            .get()
-        )
+        result = odata_client.entity("Customers").select("CustomerID", "CompanyName").top(5).get()
         for item in result["value"]:
             assert "CustomerID" in item
             assert "CompanyName" in item
             assert "Country" not in item
 
     def test_orderby_via_builder(self, odata_client):
-        result = (
-            odata_client.entity("Customers")
-            .orderby("CompanyName", "asc")
-            .get()
-        )
+        result = odata_client.entity("Customers").orderby("CompanyName", "asc").get()
         nomes = [c["CompanyName"] for c in result["value"]]
         assert nomes == sorted(nomes)
 
@@ -277,10 +266,6 @@ class TestViaS2MOdataPy:
         assert "CustomerID" in primeiro
 
     def test_produtos_filtro_numerico(self, odata_client):
-        result = (
-            odata_client.entity("Products")
-            .filter("UnitPrice gt 20")
-            .get()
-        )
+        result = odata_client.entity("Products").filter("UnitPrice gt 20").get()
         for p in result["value"]:
             assert p["UnitPrice"] > 20

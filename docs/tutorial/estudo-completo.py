@@ -36,19 +36,20 @@ Conteúdo:
 # IMPORTAÇÕES NECESSÁRIAS
 # ============================================================================
 
-from s2modatapy import S2MClient
-from s2modatapy.exceptions import S2MODataError, S2MODataConnectionError
-from datetime import datetime, date
-import time
 import json
+import time
+from datetime import date, datetime
+
+from s2modatapy import S2MClient
+from s2modatapy.exceptions import S2MODataConnectionError, S2MODataError
 
 # ============================================================================
 # PARTE 1: INTRODUÇÃO AO ODATA E S2MODATAPY
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 1: INTRODUÇÃO AO ODATA V4 E S2MODATAPY".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 O QUE É ODATA?
@@ -85,9 +86,9 @@ input("\n⏸️  Pressione ENTER para continuar para a PARTE 2...")
 # PARTE 2: CONFIGURAÇÃO INICIAL
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 2: CONFIGURAÇÃO INICIAL - CRIANDO O CLIENTE".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 CONFIGURANDO O CLIENTE S2MODATAPY:
@@ -107,24 +108,19 @@ client_padrao = S2MClient("https://services.odata.org/V4/Northwind/Northwind.svc
 print("   ✅ Cliente criado com sucesso!")
 
 print("\n📌 Exemplo 2: Cliente com debug (para desenvolvimento)")
-client_debug = S2MClient(
-    "https://services.odata.org/V4/Northwind/Northwind.svc/",
-    debug=True
-)
+client_debug = S2MClient("https://services.odata.org/V4/Northwind/Northwind.svc/", debug=True)
 print("   ✅ Cliente com debug criado (recomendado durante desenvolvimento)")
 
 print("\n📌 Exemplo 3: Cliente para produção (sem debug)")
 client_prod = S2MClient(
-    "https://services.odata.org/V4/Northwind/Northwind.svc/",
-    debug=False,
-    response_format='json'
+    "https://services.odata.org/V4/Northwind/Northwind.svc/", debug=False, response_format="json"
 )
 print("   ✅ Cliente de produção criado (debug desligado para performance)")
 
 # Vamos usar um cliente base para os próximos exemplos
 client = S2MClient(
     "https://services.odata.org/V4/Northwind/Northwind.svc/",
-    debug=False  # Desligamos o debug para os exemplos básicos
+    debug=False,  # Desligamos o debug para os exemplos básicos
 )
 
 print("\n💡 DICA: O debug mostra a URL exata da requisição, headers, tempo de resposta")
@@ -136,9 +132,9 @@ input("\n⏸️  Pressione ENTER para continuar para a PARTE 3...")
 # PARTE 3: CONSULTAS BÁSICAS (EQUIVALENTE AO SELECT SIMPLES)
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 3: CONSULTAS BÁSICAS - ENTENDENDO O .get()".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 CONSULTANDO DADOS COM .get():
@@ -168,8 +164,10 @@ print(f"   - Chaves disponíveis: {list(resultado.keys())}")
 print(f"   - Total retornado: {len(resultado['value'])} clientes")
 
 print(f"\n📋 Lista de clientes:")
-for i, cliente in enumerate(resultado['value'], 1):
-    print(f"   {i:2d}. {cliente['CustomerID']:5s} - {cliente['CompanyName'][:35]:35s} - {cliente['Country']}")
+for i, cliente in enumerate(resultado["value"], 1):
+    print(
+        f"   {i:2d}. {cliente['CustomerID']:5s} - {cliente['CompanyName'][:35]:35s} - {cliente['Country']}"
+    )
 
 print(f"""
 💡 EXPLICAÇÃO:
@@ -186,9 +184,9 @@ input("\n⏸️  Pressione ENTER para continuar...")
 # PARTE 4: FILTROS (EQUIVALENTE AO WHERE DO SQL)
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 4: FILTROS - O PODER DO .filter()".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 FILTRANDO DADOS COM .filter():
@@ -218,66 +216,78 @@ EXEMPLOS PRÁTICOS:
 # EXEMPLO 1: Filtro simples (igualdade)
 print("\n📌 EXEMPLO 1: Clientes do Brasil (filtro de igualdade)")
 print("   Filtro: \"Country eq 'Brazil'\"")
-resultado = client.entity("Customers")\
-    .filter("Country eq 'Brazil'")\
-    .select("CustomerID", "CompanyName", "Country")\
+resultado = (
+    client.entity("Customers")
+    .filter("Country eq 'Brazil'")
+    .select("CustomerID", "CompanyName", "Country")
     .get()
+)
 
 print(f"   Total de clientes brasileiros: {len(resultado['value'])}")
-for cliente in resultado['value']:
+for cliente in resultado["value"]:
     print(f"   → {cliente['CustomerID']}: {cliente['CompanyName']}")
 
 # EXEMPLO 2: Filtro numérico (maior que)
 print("\n📌 EXEMPLO 2: Produtos caros (preço > R$ 50)")
-print("   Filtro: \"UnitPrice gt 50\"")
-resultado = client.entity("Products")\
-    .filter("UnitPrice gt 50")\
-    .select("ProductName", "UnitPrice")\
-    .orderby("UnitPrice", "desc")\
-    .top(5)\
+print('   Filtro: "UnitPrice gt 50"')
+resultado = (
+    client.entity("Products")
+    .filter("UnitPrice gt 50")
+    .select("ProductName", "UnitPrice")
+    .orderby("UnitPrice", "desc")
+    .top(5)
     .get()
+)
 
 print(f"   Top 5 produtos mais caros:")
-for produto in resultado['value']:
+for produto in resultado["value"]:
     print(f"   → {produto['ProductName'][:30]:30s} - US$ {produto['UnitPrice']:.2f}")
 
 # EXEMPLO 3: Filtro com string (contém)
 print("\n📌 EXEMPLO 3: Produtos que contém 'Coffee' no nome")
 print("   Filtro: \"contains(ProductName, 'Coffee')\"")
-resultado = client.entity("Products")\
-    .filter("contains(ProductName, 'Coffee')")\
-    .select("ProductName", "UnitPrice")\
+resultado = (
+    client.entity("Products")
+    .filter("contains(ProductName, 'Coffee')")
+    .select("ProductName", "UnitPrice")
     .get()
+)
 
 print(f"   Produtos encontrados: {len(resultado['value'])}")
-for produto in resultado['value']:
+for produto in resultado["value"]:
     print(f"   → {produto['ProductName']} - US$ {produto['UnitPrice']:.2f}")
 
 # EXEMPLO 4: Filtro combinado (AND)
 print("\n📌 EXEMPLO 4: Produtos caros E em estoque (AND)")
-print("   Filtro: \"UnitPrice gt 50 and UnitsInStock gt 0\"")
-resultado = client.entity("Products")\
-    .filter("UnitPrice gt 50 and UnitsInStock gt 0")\
-    .select("ProductName", "UnitPrice", "UnitsInStock")\
-    .top(5)\
+print('   Filtro: "UnitPrice gt 50 and UnitsInStock gt 0"')
+resultado = (
+    client.entity("Products")
+    .filter("UnitPrice gt 50 and UnitsInStock gt 0")
+    .select("ProductName", "UnitPrice", "UnitsInStock")
+    .top(5)
     .get()
+)
 
 print(f"   Produtos disponíveis (caros e em estoque):")
-for produto in resultado['value']:
-    print(f"   → {produto['ProductName'][:30]:30s} - US$ {produto['UnitPrice']:.2f} (estoque: {produto['UnitsInStock']})")
+for produto in resultado["value"]:
+    print(
+        f"   → {produto['ProductName'][:30]:30s} - US$ {produto['UnitPrice']:.2f} (estoque: {produto['UnitsInStock']})"
+    )
 
 # EXEMPLO 5: Filtro com data
 print("\n📌 EXEMPLO 5: Pedidos recentes (data maior ou igual)")
-print("   Filtro: \"OrderDate ge 1998-05-01\"")
-resultado = client.entity("Orders")\
-    .filter("OrderDate ge 1998-05-01")\
-    .select("OrderID", "OrderDate")\
-    .orderby("OrderDate", "asc")\
-    .top(3)\
+print('   Filtro: "OrderDate ge 1998-05-01"')
+resultado = (
+    client.entity("Orders")
+    .filter("OrderDate ge 1998-05-01")
+    .select("OrderID", "OrderDate")
+    .orderby("OrderDate", "asc")
+    .top(3)
     .get()
+)
 
 print(f"   Primeiros pedidos após Maio/1998:")
-for pedido in resultado['value']:
+for pedido in resultado["value"]:
     print(f"   → Pedido {pedido['OrderID']:5d} - Data: {pedido['OrderDate']}")
 
 print("""
@@ -295,9 +305,9 @@ input("\n⏸️  Pressione ENTER para continuar...")
 # PARTE 5: ORDENAÇÃO (EQUIVALENTE AO ORDER BY)
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 5: ORDENAÇÃO - ORGANIZANDO RESULTADOS".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 ORDENANDO RESULTADOS COM .orderby():
@@ -316,41 +326,47 @@ EXEMPLOS PRÁTICOS:
 
 # EXEMPLO 1: Ordenação crescente (menor para maior)
 print("\n📌 EXEMPLO 1: Produtos do mais barato ao mais caro (ascendente)")
-print("   Ordenação: .orderby(\"UnitPrice\", \"asc\")")
-resultado = client.entity("Products")\
-    .select("ProductName", "UnitPrice")\
-    .orderby("UnitPrice", "asc")\
-    .top(5)\
+print('   Ordenação: .orderby("UnitPrice", "asc")')
+resultado = (
+    client.entity("Products")
+    .select("ProductName", "UnitPrice")
+    .orderby("UnitPrice", "asc")
+    .top(5)
     .get()
+)
 
 print(f"   Produtos mais baratos:")
-for produto in resultado['value']:
+for produto in resultado["value"]:
     print(f"   → {produto['ProductName'][:30]:30s} - US$ {produto['UnitPrice']:.2f}")
 
 # EXEMPLO 2: Ordenação decrescente (maior para menor)
 print("\n📌 EXEMPLO 2: Produtos do mais caro ao mais barato (descendente)")
-print("   Ordenação: .orderby(\"UnitPrice\", \"desc\")")
-resultado = client.entity("Products")\
-    .select("ProductName", "UnitPrice")\
-    .orderby("UnitPrice", "desc")\
-    .top(5)\
+print('   Ordenação: .orderby("UnitPrice", "desc")')
+resultado = (
+    client.entity("Products")
+    .select("ProductName", "UnitPrice")
+    .orderby("UnitPrice", "desc")
+    .top(5)
     .get()
+)
 
 print(f"   Produtos mais caros:")
-for produto in resultado['value']:
+for produto in resultado["value"]:
     print(f"   → {produto['ProductName'][:30]:30s} - US$ {produto['UnitPrice']:.2f}")
 
 # EXEMPLO 3: Ordenação alfabética
 print("\n📌 EXEMPLO 3: Clientes ordenados por nome (alfabético)")
-print("   Ordenação: .orderby(\"CompanyName\", \"asc\")")
-resultado = client.entity("Customers")\
-    .select("CustomerID", "CompanyName")\
-    .filter("Country eq 'Brazil'")\
-    .orderby("CompanyName", "asc")\
+print('   Ordenação: .orderby("CompanyName", "asc")')
+resultado = (
+    client.entity("Customers")
+    .select("CustomerID", "CompanyName")
+    .filter("Country eq 'Brazil'")
+    .orderby("CompanyName", "asc")
     .get()
+)
 
 print(f"   Clientes brasileiros em ordem alfabética:")
-for cliente in resultado['value']:
+for cliente in resultado["value"]:
     print(f"   → {cliente['CompanyName']}")
 
 print("""
@@ -368,9 +384,9 @@ input("\n⏸️  Pressione ENTER para continuar...")
 # PARTE 6: PAGINAÇÃO (TOP E SKIP)
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 6: PAGINAÇÃO - CONTROLE DE VOLUME DE DADOS".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 PAGINANDO RESULTADOS COM .top() e .skip():
@@ -391,25 +407,18 @@ EXEMPLOS PRÁTICOS:
 
 # EXEMPLO 1: Limitando resultados
 print("\n📌 EXEMPLO 1: Limitando a 3 registros (.top(3))")
-resultado = client.entity("Products")\
-    .select("ProductName")\
-    .top(3)\
-    .get()
+resultado = client.entity("Products").select("ProductName").top(3).get()
 
 print(f"   Retornou {len(resultado['value'])} produtos:")
-for produto in resultado['value']:
+for produto in resultado["value"]:
     print(f"   → {produto['ProductName']}")
 
 # EXEMPLO 2: Pulando e limitando (página 2)
 print("\n📌 EXEMPLO 2: Segunda página (.skip(3).top(3))")
-resultado = client.entity("Products")\
-    .select("ProductName")\
-    .skip(3)\
-    .top(3)\
-    .get()
+resultado = client.entity("Products").select("ProductName").skip(3).top(3).get()
 
 print(f"   Retornou {len(resultado['value'])} produtos (página 2):")
-for produto in resultado['value']:
+for produto in resultado["value"]:
     print(f"   → {produto['ProductName']}")
 
 # EXEMPLO 3: Sistema de paginação completo
@@ -418,15 +427,19 @@ itens_por_pagina = 5
 pagina_atual = 1
 
 print(f"   Configuração: {itens_por_pagina} itens por página")
-resultado = client.entity("Customers")\
-    .select("CustomerID", "CompanyName")\
-    .orderby("CompanyName", "asc")\
-    .skip((pagina_atual - 1) * itens_por_pagina)\
-    .top(itens_por_pagina)\
+resultado = (
+    client.entity("Customers")
+    .select("CustomerID", "CompanyName")
+    .orderby("CompanyName", "asc")
+    .skip((pagina_atual - 1) * itens_por_pagina)
+    .top(itens_por_pagina)
     .get()
+)
 
-print(f"   Página {pagina_atual} (itens {(pagina_atual-1)*itens_por_pagina+1} a {pagina_atual*itens_por_pagina}):")
-for cliente in resultado['value']:
+print(
+    f"   Página {pagina_atual} (itens {(pagina_atual-1)*itens_por_pagina+1} a {pagina_atual*itens_por_pagina}):"
+)
+for cliente in resultado["value"]:
     print(f"   → {cliente['CustomerID']}: {cliente['CompanyName']}")
 
 print("""
@@ -449,9 +462,9 @@ input("\n⏸️  Pressione ENTER para continuar...")
 # PARTE 7: SELEÇÃO DE CAMPOS (EQUIVALENTE AO SELECT DO SQL)
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 7: SELEÇÃO DE CAMPOS - OTIMIZANDO RESPOSTAS".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 SELECIONANDO CAMPOS ESPECÍFICOS COM .select():
@@ -475,17 +488,16 @@ EXEMPLO PRÁTICO - COMPARAÇÃO:
 # Sem select (todos os campos)
 print("\n📌 SEM .select(): Retorna TODOS os campos da entidade")
 resultado_sem_select = client.entity("Products").top(1).get()
-primeiro_produto = resultado_sem_select['value'][0]
+primeiro_produto = resultado_sem_select["value"][0]
 print(f"   Número de campos retornados: {len(primeiro_produto.keys())}")
 print(f"   Campos: {list(primeiro_produto.keys())[:10]}... (truncado)")
 
 # Com select (apenas 3 campos)
 print("\n📌 COM .select(): Retorna APENAS os campos especificados")
-resultado_com_select = client.entity("Products")\
-    .select("ProductID", "ProductName", "UnitPrice")\
-    .top(1)\
-    .get()
-produto_limitado = resultado_com_select['value'][0]
+resultado_com_select = (
+    client.entity("Products").select("ProductID", "ProductName", "UnitPrice").top(1).get()
+)
+produto_limitado = resultado_com_select["value"][0]
 print(f"   Número de campos retornados: {len(produto_limitado.keys())}")
 print(f"   Campos: {list(produto_limitado.keys())}")
 
@@ -500,16 +512,20 @@ print(f"""
 """)
 
 print("\n📌 EXEMPLO PRÁTICO: Criando um relatório enxuto")
-resultado = client.entity("Products")\
-    .select("ProductName", "UnitPrice", "UnitsInStock")\
-    .filter("UnitsInStock lt 10")\
-    .orderby("UnitsInStock", "asc")\
-    .top(5)\
+resultado = (
+    client.entity("Products")
+    .select("ProductName", "UnitPrice", "UnitsInStock")
+    .filter("UnitsInStock lt 10")
+    .orderby("UnitsInStock", "asc")
+    .top(5)
     .get()
+)
 
 print(f"   Produtos com baixo estoque (relatório):")
-for produto in resultado['value']:
-    print(f"   📦 {produto['ProductName'][:35]:35s} | Estoque: {produto['UnitsInStock']:3d} | Preço: US$ {produto['UnitPrice']:.2f}")
+for produto in resultado["value"]:
+    print(
+        f"   📦 {produto['ProductName'][:35]:35s} | Estoque: {produto['UnitsInStock']:3d} | Preço: US$ {produto['UnitPrice']:.2f}"
+    )
 
 input("\n⏸️  Pressione ENTER para continuar...")
 
@@ -517,9 +533,9 @@ input("\n⏸️  Pressione ENTER para continuar...")
 # PARTE 8: RELACIONAMENTOS (JOIN COM $expand)
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 8: RELACIONAMENTOS - CONSULTANDO DADOS RELACIONADOS".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 EXPANDINDO RELACIONAMENTOS COM .expand():
@@ -540,26 +556,21 @@ EXEMPLOS PRÁTICOS:
 
 # EXEMPLO 1: Sem expand (apenas a referência)
 print("\n📌 SEM .expand(): Retorna apenas o ID do cliente")
-resultado = client.entity("Orders")\
-    .select("OrderID", "CustomerID", "OrderDate")\
-    .top(3)\
-    .get()
+resultado = client.entity("Orders").select("OrderID", "CustomerID", "OrderDate").top(3).get()
 
 print(f"   Pedidos (apenas referência ao cliente):")
-for pedido in resultado['value']:
-    print(f"   Pedido {pedido['OrderID']} - Cliente ID: {pedido['CustomerID']} (não tem dados do cliente)")
+for pedido in resultado["value"]:
+    print(
+        f"   Pedido {pedido['OrderID']} - Cliente ID: {pedido['CustomerID']} (não tem dados do cliente)"
+    )
 
 # EXEMPLO 2: Com expand (dados completos)
 print("\n📌 COM .expand(): Retorna todos os dados do cliente")
-resultado = client.entity("Orders")\
-    .select("OrderID", "OrderDate")\
-    .expand("Customer")\
-    .top(3)\
-    .get()
+resultado = client.entity("Orders").select("OrderID", "OrderDate").expand("Customer").top(3).get()
 
 print(f"   Pedidos com dados completos do cliente:")
-for pedido in resultado['value']:
-    cliente = pedido['Customer']
+for pedido in resultado["value"]:
+    cliente = pedido["Customer"]
     print(f"   📦 Pedido {pedido['OrderID']} - Data: {pedido['OrderDate']}")
     print(f"      👤 Cliente: {cliente['CompanyName']} ({cliente['Country']})")
 
@@ -569,17 +580,19 @@ print("   Nota: A Northwind não suporta múltiplos expands diretamente,")
 print("   mas a sintaxe correta seria: .expand('Customer', 'Employee')")
 
 print("\n📌 EXEMPLO AVANÇADO: Pedidos de clientes brasileiros")
-resultado = client.entity("Orders")\
-    .select("OrderID", "OrderDate", "Freight")\
-    .expand("Customer")\
-    .filter("Customer/Country eq 'Brazil'")\
-    .orderby("OrderDate", "desc")\
-    .top(3)\
+resultado = (
+    client.entity("Orders")
+    .select("OrderID", "OrderDate", "Freight")
+    .expand("Customer")
+    .filter("Customer/Country eq 'Brazil'")
+    .orderby("OrderDate", "desc")
+    .top(3)
     .get()
+)
 
 print(f"   Últimos pedidos de clientes brasileiros:")
-for pedido in resultado['value']:
-    cliente = pedido['Customer']
+for pedido in resultado["value"]:
+    cliente = pedido["Customer"]
     print(f"   🛒 Pedido {pedido['OrderID']} - Data: {pedido['OrderDate']}")
     print(f"      Cliente: {cliente['CompanyName']}")
     print(f"      Frete: US$ {pedido['Freight']:.2f}")
@@ -600,9 +613,9 @@ input("\n⏸️  Pressione ENTER para continuar...")
 # PARTE 9: CONTAGEM DE REGISTROS (COUNT)
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 9: CONTAGEM - SABENDO QUANTOS REGISTROS EXISTEM".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 CONTANDO REGISTROS COM .count() e .count_only():
@@ -619,11 +632,7 @@ EXEMPLOS PRÁTICOS:
 
 # EXEMPLO 1: Count inclusivo (dados + contagem)
 print("\n📌 MODO 1: .count(True) - Retorna dados E contagem")
-resultado = client.entity("Products")\
-    .filter("UnitPrice gt 50")\
-    .count(True)\
-    .top(5)\
-    .get()
+resultado = client.entity("Products").filter("UnitPrice gt 50").count(True).top(5).get()
 
 print(f"   Registros retornados: {len(resultado['value'])} (limitado pelo .top(5))")
 print(f"   Total disponível no servidor: {resultado.get('@odata.count', 0)}")
@@ -656,9 +665,9 @@ input("\n⏸️  Pressione ENTER para continuar...")
 # PARTE 10: TRATAMENTO DE ERROS
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 10: TRATAMENTO DE ERROS - CÓDIGO ROBUSTO".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 TRATANDO ERROS COM TRY-EXCEPT:
@@ -675,9 +684,10 @@ EXCEÇÕES DISPONÍVEIS:
 EXEMPLOS PRÁTICOS:
 ----------------""")
 
+
 def consulta_segura():
     """Exemplo de função com tratamento de erros"""
-    
+
     # EXEMPLO 1: Entidade inválida
     print("\n📌 EXEMPLO 1: Tentando acessar entidade inexistente")
     try:
@@ -685,18 +695,15 @@ def consulta_segura():
         print("   ❌ Isso não deveria acontecer!")
     except S2MODataError as e:
         print(f"   ✅ Erro capturado: {str(e)[:80]}...")
-    
+
     # EXEMPLO 2: Filtro inválido
     print("\n📌 EXEMPLO 2: Erro em filtro com campo inexistente")
     try:
-        resultado = client.entity("Customers")\
-            .filter("CampoInexistente eq 'Brazil'")\
-            .top(1)\
-            .get()
+        resultado = client.entity("Customers").filter("CampoInexistente eq 'Brazil'").top(1).get()
         print("   ❌ Isso não deveria acontecer!")
     except S2MODataError as e:
         print(f"   ✅ Erro capturado: {str(e)[:80]}...")
-    
+
     # EXEMPLO 3: Conexão inválida
     print("\n📌 EXEMPLO 3: URL inválida - teste de conexão")
     try:
@@ -707,6 +714,7 @@ def consulta_segura():
         print(f"   ✅ Erro de conexão capturado: {str(e)[:80]}...")
     except Exception as e:
         print(f"   ⚠️  Outro erro: {e}")
+
 
 consulta_segura()
 
@@ -736,9 +744,9 @@ input("\n⏸️  Pressione ENTER para continuar...")
 # PARTE 11: PERFORMANCE E BOAS PRÁTICAS
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 11: PERFORMANCE E BOAS PRÁTICAS".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 OTIMIZANDO SUAS CONSULTAS:
@@ -767,11 +775,13 @@ print(f"      Tempo: {tempo_lento:.3f}s - Dados: {len(resultado_lento['value'])}
 # Consulta OTIMIZADA
 print("\n   🟢 COM otimização (select + filtro + top):")
 start = time.time()
-resultado_rapido = client.entity("Products")\
-    .select("ProductName", "UnitPrice")\
-    .filter("UnitPrice gt 50")\
-    .top(100)\
+resultado_rapido = (
+    client.entity("Products")
+    .select("ProductName", "UnitPrice")
+    .filter("UnitPrice gt 50")
+    .top(100)
     .get()
+)
 tempo_rapido = time.time() - start
 print(f"      Tempo: {tempo_rapido:.3f}s - Dados: {len(resultado_rapido['value'])} registros")
 
@@ -792,9 +802,9 @@ input("\n⏸️  Pressione ENTER para continuar...")
 # PARTE 12: EXEMPLOS AVANÇADOS E CASOS REAIS
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 12: EXEMPLOS AVANÇADOS - CASOS REAIS".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 CASOS DE USO REAIS:
@@ -813,8 +823,8 @@ print("   ───────────────────────�
 print("   🌍 Top 5 países com mais clientes:")
 paises = {}
 clientes_totais = client.entity("Customers").get()
-for cliente in clientes_totais['value']:
-    pais = cliente['Country']
+for cliente in clientes_totais["value"]:
+    pais = cliente["Country"]
     paises[pais] = paises.get(pais, 0) + 1
 
 top_paises = sorted(paises.items(), key=lambda x: x[1], reverse=True)[:5]
@@ -825,16 +835,20 @@ for i, (pais, total) in enumerate(top_paises, 1):
 print("\n⚠️  CASO 2: Estoque Crítico")
 print("   ─────────────────────────")
 
-produtos_criticos = client.entity("Products")\
-    .select("ProductName", "UnitsInStock", "UnitPrice")\
-    .filter("UnitsInStock lt 10")\
-    .orderby("UnitsInStock", "asc")\
-    .top(5)\
+produtos_criticos = (
+    client.entity("Products")
+    .select("ProductName", "UnitsInStock", "UnitPrice")
+    .filter("UnitsInStock lt 10")
+    .orderby("UnitsInStock", "asc")
+    .top(5)
     .get()
+)
 
 print("   Produtos com estoque baixo:")
-for produto in produtos_criticos['value']:
-    print(f"      📦 {produto['ProductName'][:35]:35s} | Estoque: {produto['UnitsInStock']:3d} | Preço: US$ {produto['UnitPrice']:.2f}")
+for produto in produtos_criticos["value"]:
+    print(
+        f"      📦 {produto['ProductName'][:35]:35s} | Estoque: {produto['UnitsInStock']:3d} | Preço: US$ {produto['UnitPrice']:.2f}"
+    )
 
 # CASO 3: Sistema de busca avançada
 print("\n🔍 CASO 3: Busca de Produtos")
@@ -843,16 +857,20 @@ print("   ───────────────────────�
 termo_busca = "Chai"
 print(f"   Buscando por: '{termo_busca}'")
 
-produtos_busca = client.entity("Products")\
-    .select("ProductName", "UnitPrice", "QuantityPerUnit")\
-    .filter(f"contains(ProductName, '{termo_busca}')")\
+produtos_busca = (
+    client.entity("Products")
+    .select("ProductName", "UnitPrice", "QuantityPerUnit")
+    .filter(f"contains(ProductName, '{termo_busca}')")
     .get()
+)
 
-if produtos_busca['value']:
+if produtos_busca["value"]:
     print(f"   ✅ Encontrados {len(produtos_busca['value'])} produtos:")
-    for produto in produtos_busca['value']:
+    for produto in produtos_busca["value"]:
         print(f"      → {produto['ProductName']}")
-        print(f"        Preço: US$ {produto['UnitPrice']} | Embalagem: {produto['QuantityPerUnit']}")
+        print(
+            f"        Preço: US$ {produto['UnitPrice']} | Embalagem: {produto['QuantityPerUnit']}"
+        )
 else:
     print(f"   ❌ Nenhum produto encontrado com '{termo_busca}'")
 
@@ -860,16 +878,18 @@ else:
 print("\n📋 CASO 4: Últimos Pedidos")
 print("   ────────────────────────")
 
-pedidos_recentes = client.entity("Orders")\
-    .select("OrderID", "OrderDate", "Freight")\
-    .expand("Customer")\
-    .orderby("OrderDate", "desc")\
-    .top(3)\
+pedidos_recentes = (
+    client.entity("Orders")
+    .select("OrderID", "OrderDate", "Freight")
+    .expand("Customer")
+    .orderby("OrderDate", "desc")
+    .top(3)
     .get()
+)
 
 print("   Últimos 3 pedidos realizados:")
-for pedido in pedidos_recentes['value']:
-    cliente = pedido['Customer']
+for pedido in pedidos_recentes["value"]:
+    cliente = pedido["Customer"]
     print(f"      🛒 Pedido #{pedido['OrderID']} - {pedido['OrderDate']}")
     print(f"         Cliente: {cliente['CompanyName']}")
     print(f"         Frete: US$ {pedido['Freight']:.2f}")
@@ -880,9 +900,9 @@ input("\n⏸️  Pressione ENTER para continuar...")
 # PARTE 13: DESAFIOS PARA VOCÊ PRATICAR
 # ============================================================================
 
-print("\n" + "="*80)
+print("\n" + "=" * 80)
 print(" PARTE 13: DESAFIOS - AGORA É SUA VEZ!".center(80))
-print("="*80)
+print("=" * 80)
 
 print("""
 🎯 DESAFIO 1: Fácil
@@ -941,7 +961,7 @@ Dicas:
 print("\n💡 SOLUÇÃO DO DESAFIO 1 (para referência):")
 print("   client.entity('Products')")
 print("       .select('ProductName', 'UnitPrice')")
-print("       .filter(\"CategoryID eq 1\")")
+print('       .filter("CategoryID eq 1")')
 print("       .orderby('UnitPrice', 'desc')")
 print("       .top(10)")
 print("       .get()")

@@ -13,7 +13,7 @@ rodando em http://localhost:8000
 Author: Christopher N. S. M. Mauricio
 """
 
-from s2modatapy import S2MClient, S2MODataError, S2MODataConnectionError
+from s2modatapy import S2MClient, S2MODataConnectionError, S2MODataError
 
 
 def exemplo_leitura_basica():
@@ -27,11 +27,7 @@ def exemplo_leitura_basica():
 
     # Filtro por país com limite
     result = (
-        client.entity("Customers")
-        .filter("Country eq 'Mexico'")
-        .orderby("CompanyName")
-        .top(5)
-        .get()
+        client.entity("Customers").filter("Country eq 'Mexico'").orderby("CompanyName").top(5).get()
     )
     for c in result.get("value", []):
         print(f"  {c['CustomerID']} — {c['CompanyName']}")
@@ -63,26 +59,29 @@ def exemplo_escrita():
     client = S2MClient("http://localhost:8000/odata/")
 
     # Criar
-    novo = client.entity("Customers").create({
-        "CustomerID": "TSTBR",
-        "CompanyName": "Empresa de Teste",
-        "ContactName": "Fulano de Tal",
-        "Country": "Brazil",
-    })
+    novo = client.entity("Customers").create(
+        {
+            "CustomerID": "TSTBR",
+            "CompanyName": "Empresa de Teste",
+            "ContactName": "Fulano de Tal",
+            "Country": "Brazil",
+        }
+    )
     print(f"Criado: {novo}")
 
     # Atualização parcial (PATCH)
-    client.entity("Customers").patch("TSTBR", {
-        "ContactName": "Fulano Atualizado"
-    })
+    client.entity("Customers").patch("TSTBR", {"ContactName": "Fulano Atualizado"})
     print("Registro atualizado (PATCH)")
 
     # Substituição completa (PUT)
-    client.entity("Customers").update("TSTBR", {
-        "CustomerID": "TSTBR",
-        "CompanyName": "Empresa de Teste Renomeada",
-        "Country": "Brazil",
-    })
+    client.entity("Customers").update(
+        "TSTBR",
+        {
+            "CustomerID": "TSTBR",
+            "CompanyName": "Empresa de Teste Renomeada",
+            "Country": "Brazil",
+        },
+    )
     print("Registro substituído (PUT)")
 
     # Deletar
@@ -108,9 +107,12 @@ def exemplo_metadados():
         print(f"\nColunas da listagem:")
         for col in ann.list_view.columns:
             flags = []
-            if col.sortable:   flags.append("sortable")
-            if col.filterable: flags.append("filterable")
-            if col.required:   flags.append("required")
+            if col.sortable:
+                flags.append("sortable")
+            if col.filterable:
+                flags.append("filterable")
+            if col.required:
+                flags.append("required")
             flag_str = f" [{', '.join(flags)}]" if flags else ""
             print(f"  {col.label:20s} ({col.name}){flag_str}")
         print(f"\nOrdenação padrão: {ann.list_view.default_sort}")
@@ -131,6 +133,7 @@ def exemplo_metadados():
 
     # Config JSON pronta para uso em componentes
     from s2modatapy.parsers.annotations import ODataAnnotationParser
+
     metadata = client.get_metadata_json()
     parser = ODataAnnotationParser.from_dict(metadata)
     config = parser.to_ui_config("Customer")

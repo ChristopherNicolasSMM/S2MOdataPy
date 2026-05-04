@@ -14,33 +14,31 @@ __license__ = "MIT with Attribution"
 
 from .client import S2MClient
 from .exceptions import (
-    S2MODataError,
+    S2MODataAuthenticationError,
     S2MODataConnectionError,
+    S2MODataError,
     S2MODataNotFoundError,
     S2MODataValidationError,
-    S2MODataAuthenticationError,
 )
 from .parsers.annotations import (
+    FieldType,
     ODataAnnotationParser,
     UIAnnotations,
-    UIListView,
-    UIFieldGroup,
     UIField,
+    UIFieldGroup,
     UIForm,
-    FieldType,
+    UIListView,
 )
 
 __all__ = [
     # Cliente principal
     "S2MClient",
-
     # Exceções
     "S2MODataError",
     "S2MODataConnectionError",
     "S2MODataNotFoundError",
     "S2MODataValidationError",
     "S2MODataAuthenticationError",
-
     # Parser de metadados / anotações
     "ODataAnnotationParser",
     "UIAnnotations",

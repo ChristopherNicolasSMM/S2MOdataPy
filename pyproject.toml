@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=61.0", "wheel"]  # wheel é opcional
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -22,7 +22,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
+    # Python 3.13 removido temporariamente (CI pode não suportar)
 ]
 dependencies = [
     "requests>=2.31.0",
@@ -35,26 +35,40 @@ dev = [
     "pytest-cov>=4.1.0",
     "black>=23.0.0",
     "isort>=5.12.0",
+    "flake8>=6.0.0",       # adicionado
+    "mypy>=1.0.0",         # opcional, mas útil
 ]
 
 [project.urls]
-Homepage      = "https://github.com/ChristopherNicolasSMM/S2MOdataPy"
-Repository    = "https://github.com/ChristopherNicolasSMM/S2MOdataPy.git"
+Homepage = "https://github.com/ChristopherNicolasSMM/S2MOdataPy"
+Repository = "https://github.com/ChristopherNicolasSMM/S2MOdataPy.git"
 Documentation = "https://github.com/ChristopherNicolasSMM/S2MOdataPy"
 
 [tool.setuptools.packages.find]
-where   = ["."]
+where = ["."]
 include = ["s2modatapy*"]
 
 [tool.pytest.ini_options]
-testpaths    = ["tests"]
+testpaths = ["tests"]
 python_files = "test_*.py"
-addopts      = "-v --tb=short"
+addopts = "-v --tb=short"
 
 [tool.black]
-line-length    = 100
+line-length = 88                 # alterado de 100 para 88
 target-version = ["py38"]
+extend-exclude = '''
+/(
+    DemoAnotation
+  | docs
+  | examples
+  | tests
+)/
+'''
 
 [tool.isort]
-profile     = "black"
-line_length = 100
+profile = "black"
+line_length = 88                 # alterado de 100 para 88
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = ["E203"]

@@ -4,16 +4,18 @@ Módulo principal do cliente S2MOdataPy
 Author: Christopher N. S. M. Mauricio
 """
 
+from typing import Any, Dict, Optional, Tuple
+
 import requests
-from typing import Dict, Any, Optional, Tuple
-from .query_builder import ODataQueryBuilder
+
 from .debug import DebugMonitor
 from .exceptions import (
-    S2MODataError,
-    S2MODataConnectionError,
-    S2MODataNotFoundError,
     S2MODataAuthenticationError,
+    S2MODataConnectionError,
+    S2MODataError,
+    S2MODataNotFoundError,
 )
+from .query_builder import ODataQueryBuilder
 
 
 class S2MClient:
@@ -84,9 +86,7 @@ class S2MClient:
 
         # Autenticação Bearer
         if bearer_token is not None:
-            self.session.headers.update(
-                {"Authorization": f"Bearer {bearer_token}"}
-            )
+            self.session.headers.update({"Authorization": f"Bearer {bearer_token}"})
 
         if debug:
             print(f"[S2MOdataPy] Cliente inicializado")
@@ -220,13 +220,10 @@ class S2MClient:
             # Tratamento de status HTTP específicos
             if response.status_code in (401, 403):
                 raise S2MODataAuthenticationError(
-                    f"Autenticação falhou ({response.status_code}). "
-                    "Verifique as credenciais."
+                    f"Autenticação falhou ({response.status_code}). " "Verifique as credenciais."
                 )
             if response.status_code == 404:
-                raise S2MODataNotFoundError(
-                    f"Recurso não encontrado: {endpoint}"
-                )
+                raise S2MODataNotFoundError(f"Recurso não encontrado: {endpoint}")
 
             response.raise_for_status()
 
@@ -237,9 +234,7 @@ class S2MClient:
             return response.json()
 
         except requests.exceptions.ConnectionError as e:
-            raise S2MODataConnectionError(
-                f"Falha na conexão com '{self.base_url}': {e}"
-            )
+            raise S2MODataConnectionError(f"Falha na conexão com '{self.base_url}': {e}")
         except (S2MODataAuthenticationError, S2MODataNotFoundError):
             raise
         except requests.exceptions.HTTPError as e:

@@ -16,7 +16,7 @@ Uso:
 Author: Christopher N. S. M. Mauricio
 """
 
-from typing import List, Dict, Optional
+from typing import Dict, List, Optional
 
 
 class UI:
@@ -44,10 +44,10 @@ class UI:
             dict: Dicionário de configuração do campo.
         """
         return {
-            "name":       name,
-            "label":      label or name,
-            "width":      width,
-            "sortable":   sortable,
+            "name": name,
+            "label": label or name,
+            "width": width,
+            "sortable": sortable,
             "filterable": filterable,
         }
 
@@ -70,14 +70,16 @@ class UI:
                 default_sort="Name asc"
             )
         """
+
         def decorator(cls_entity):
             if not hasattr(cls_entity, "_ui_annotations"):
                 cls_entity._ui_annotations = {}
             cls_entity._ui_annotations["ListView"] = {
-                "columns":      columns,
+                "columns": columns,
                 "default_sort": default_sort,
             }
             return cls_entity
+
         return decorator
 
     @classmethod
@@ -104,18 +106,22 @@ class UI:
             @UI.FieldGroup("Address", label="Endereço",
                            fields=["Country", "City", "PostalCode"])
         """
+
         def decorator(cls_entity):
             if not hasattr(cls_entity, "_ui_annotations"):
                 cls_entity._ui_annotations = {}
             if "FieldGroups" not in cls_entity._ui_annotations:
                 cls_entity._ui_annotations["FieldGroups"] = []
-            cls_entity._ui_annotations["FieldGroups"].append({
-                "name":        name,
-                "label":       label,
-                "fields":      fields,
-                "collapsible": collapsible,
-            })
+            cls_entity._ui_annotations["FieldGroups"].append(
+                {
+                    "name": name,
+                    "label": label,
+                    "fields": fields,
+                    "collapsible": collapsible,
+                }
+            )
             return cls_entity
+
         return decorator
 
 
@@ -134,11 +140,13 @@ class Common:
             @Common.Label("Clientes")
             class Customer(Base): ...
         """
+
         def decorator(cls_entity):
             if not hasattr(cls_entity, "_ui_annotations"):
                 cls_entity._ui_annotations = {}
             cls_entity._ui_annotations["Label"] = value
             return cls_entity
+
         return decorator
 
 
@@ -163,14 +171,18 @@ class Validation:
             field (str): Nome do campo.
             message (str): Mensagem de erro exibida quando vazio.
         """
+
         def decorator(cls_entity):
             if not hasattr(cls_entity, "_validations"):
                 cls_entity._validations = {}
-            cls_entity._validations.setdefault(field, []).append({
-                "type":    "required",
-                "message": message,
-            })
+            cls_entity._validations.setdefault(field, []).append(
+                {
+                    "type": "required",
+                    "message": message,
+                }
+            )
             return cls_entity
+
         return decorator
 
     @staticmethod
@@ -184,15 +196,19 @@ class Validation:
             message (str): Mensagem personalizada (opcional).
         """
         msg = message or f"Máximo de {max_len} caracteres"
+
         def decorator(cls_entity):
             if not hasattr(cls_entity, "_validations"):
                 cls_entity._validations = {}
-            cls_entity._validations.setdefault(field, []).append({
-                "type":    "max_length",
-                "max":     max_len,
-                "message": msg,
-            })
+            cls_entity._validations.setdefault(field, []).append(
+                {
+                    "type": "max_length",
+                    "max": max_len,
+                    "message": msg,
+                }
+            )
             return cls_entity
+
         return decorator
 
     @staticmethod
@@ -206,15 +222,19 @@ class Validation:
             message (str): Mensagem personalizada (opcional).
         """
         msg = message or f"Mínimo de {min_len} caracteres"
+
         def decorator(cls_entity):
             if not hasattr(cls_entity, "_validations"):
                 cls_entity._validations = {}
-            cls_entity._validations.setdefault(field, []).append({
-                "type":    "min_length",
-                "min":     min_len,
-                "message": msg,
-            })
+            cls_entity._validations.setdefault(field, []).append(
+                {
+                    "type": "min_length",
+                    "min": min_len,
+                    "message": msg,
+                }
+            )
             return cls_entity
+
         return decorator
 
     @staticmethod
@@ -227,15 +247,19 @@ class Validation:
             regex (str): Expressão regular a validar.
             message (str): Mensagem de erro quando inválido.
         """
+
         def decorator(cls_entity):
             if not hasattr(cls_entity, "_validations"):
                 cls_entity._validations = {}
-            cls_entity._validations.setdefault(field, []).append({
-                "type":    "pattern",
-                "regex":   regex,
-                "message": message,
-            })
+            cls_entity._validations.setdefault(field, []).append(
+                {
+                    "type": "pattern",
+                    "regex": regex,
+                    "message": message,
+                }
+            )
             return cls_entity
+
         return decorator
 
     @staticmethod

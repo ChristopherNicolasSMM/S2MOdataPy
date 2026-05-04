@@ -31,6 +31,7 @@ class S2MODataConnectionError(S2MODataError):
 
     Levantada quando o servidor está inacessível ou a URL está incorreta.
     """
+
     pass
 
 
@@ -40,6 +41,7 @@ class S2MODataNotFoundError(S2MODataError):
 
     Levantada quando a entidade ou o registro solicitado não existe.
     """
+
     pass
 
 
@@ -50,6 +52,7 @@ class S2MODataValidationError(S2MODataError):
     Levantada quando o servidor rejeita os dados por violação de regras
     de negócio ou de schema (HTTP 400/422).
     """
+
     pass
 
 
@@ -60,6 +63,7 @@ class S2MODataAuthenticationError(S2MODataError):
     Levantada quando as credenciais são inválidas ou insuficientes
     para acessar o recurso solicitado.
     """
+
     pass
 
 
@@ -70,4 +74,5 @@ class S2MODataParseError(S2MODataError):
     Levantada quando o conteúdo retornado não pode ser interpretado
     como JSON ou XML válido.
     """
+
     pass

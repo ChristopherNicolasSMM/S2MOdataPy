@@ -4,7 +4,7 @@ Módulo de Query Builder para OData V4
 Author: Christopher N. S. M. Mauricio
 """
 
-from typing import Dict, Any, Optional, List
+from typing import Any, Dict, List, Optional
 
 
 class ODataQueryBuilder:

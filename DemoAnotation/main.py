@@ -27,25 +27,27 @@ Author: Christopher N. S. M. Mauricio
 import os
 from contextlib import asynccontextmanager
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.responses import Response
-from dotenv import load_dotenv
 
 load_dotenv()
 ENV = os.getenv("ENVIRONMENT", "dev")
 
-# Importa modelos ANTES de criar tabelas (necessário para o SQLAlchemy registrá-los)
-from database import engine, Base, get_db
-from models.customer import Customer   # noqa: F401
-from models.order    import Order      # noqa: F401
-from models.product  import Product    # noqa: F401
-from odata.endpoint  import router as odata_router, ENTITY_MAP
-from annotations.metadata_builder import build_metadata_xml, build_metadata_dict
+from annotations.metadata_builder import build_metadata_dict, build_metadata_xml
 
+# Importa modelos ANTES de criar tabelas (necessário para o SQLAlchemy registrá-los)
+from database import Base, engine, get_db
+from models.customer import Customer  # noqa: F401
+from models.order import Order  # noqa: F401
+from models.product import Product  # noqa: F401
+from odata.endpoint import ENTITY_MAP
+from odata.endpoint import router as odata_router
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Startup
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -61,6 +63,7 @@ async def lifespan(app: FastAPI):
             if db.query(Customer).count() == 0:
                 print("[Server] Banco vazio. Carregando dados mock...")
                 from mock_data import load_mock_data
+
                 load_mock_data(db)
             else:
                 print("[Server] Banco já populado. Nenhuma ação necessária.")
@@ -96,6 +99,7 @@ app = FastAPI(
 # com o parâmetro {entity} definido no endpoint.py.
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 @app.get("/odata/$metadata", include_in_schema=False)
 def metadata_xml():
     """
@@ -104,7 +108,7 @@ def metadata_xml():
     Inclui definição de EntityType, anotações de ListView (UI.LineItem)
     e FieldGroups (UI.FieldGroup) para cada entidade registrada.
     """
-    entities    = list(ENTITY_MAP.values())
+    entities = list(ENTITY_MAP.values())
     xml_content = build_metadata_xml(entities)
     return Response(content=xml_content, media_type="application/xml; charset=utf-8")
 
@@ -132,17 +136,18 @@ app.include_router(odata_router)
 # Health check
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 @app.get("/")
 def root():
     return {
-        "status":   "online",
-        "service":  "S2MOdataPy Demo Server",
-        "version":  "1.0.0",
+        "status": "online",
+        "service": "S2MOdataPy Demo Server",
+        "version": "1.0.0",
         "entities": list(ENTITY_MAP.keys()),
         "docs": {
-            "swagger":   "/docs",
-            "redoc":     "/redoc",
-            "metadata":  "/odata/$metadata",
+            "swagger": "/docs",
+            "redoc": "/redoc",
+            "metadata": "/odata/$metadata",
             "meta_json": "/odata/$metadata.json",
         },
     }

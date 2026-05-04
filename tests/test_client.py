@@ -6,27 +6,29 @@ Cobre: S2MClient, ODataQueryBuilder, ODataAnnotationParser e exceções.
 Author: Christopher N. S. M. Mauricio
 """
 
+from unittest.mock import MagicMock, PropertyMock, patch
+
 import pytest
-from unittest.mock import MagicMock, patch, PropertyMock
+
 from s2modatapy import (
-    S2MClient,
-    S2MODataError,
-    S2MODataConnectionError,
-    S2MODataNotFoundError,
-    S2MODataAuthenticationError,
-    ODataAnnotationParser,
-    UIAnnotations,
-    UIListView,
-    UIForm,
-    UIField,
     FieldType,
+    ODataAnnotationParser,
+    S2MClient,
+    S2MODataAuthenticationError,
+    S2MODataConnectionError,
+    S2MODataError,
+    S2MODataNotFoundError,
+    UIAnnotations,
+    UIField,
+    UIForm,
+    UIListView,
 )
 from s2modatapy.query_builder import ODataQueryBuilder
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Fixtures
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 @pytest.fixture
 def client():
@@ -56,14 +58,29 @@ def mock_metadata_json():
                 "label": "Clientes",
                 "properties": [
                     {"name": "CustomerID", "type": "Edm.String", "nullable": False, "maxLength": 5},
-                    {"name": "CompanyName", "type": "Edm.String", "nullable": False, "maxLength": 80},
+                    {
+                        "name": "CompanyName",
+                        "type": "Edm.String",
+                        "nullable": False,
+                        "maxLength": 80,
+                    },
                     {"name": "Country", "type": "Edm.String", "nullable": True},
                 ],
                 "ui": {
                     "listView": {
                         "columns": [
-                            {"name": "CustomerID", "label": "Código", "sortable": False, "filterable": False},
-                            {"name": "CompanyName", "label": "Empresa", "sortable": True, "filterable": False},
+                            {
+                                "name": "CustomerID",
+                                "label": "Código",
+                                "sortable": False,
+                                "filterable": False,
+                            },
+                            {
+                                "name": "CompanyName",
+                                "label": "Empresa",
+                                "sortable": True,
+                                "filterable": False,
+                            },
                             {"name": "Country", "label": "País", "filterable": True},
                         ],
                         "default_sort": "CompanyName asc",
@@ -93,6 +110,7 @@ def mock_metadata_json():
 # ─────────────────────────────────────────────────────────────────────────────
 # Testes — S2MClient inicialização
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestS2MClientInit:
     def test_base_url_trailing_slash_removed(self):
@@ -124,6 +142,7 @@ class TestS2MClientInit:
 # ─────────────────────────────────────────────────────────────────────────────
 # Testes — ODataQueryBuilder (leitura)
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestQueryBuilderRead:
     def test_entity_returns_builder(self, client):
@@ -205,6 +224,7 @@ class TestQueryBuilderRead:
 # Testes — ODataQueryBuilder (escrita — chave)
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 class TestQueryBuilderKeyEndpoint:
     def test_string_key_quoted(self, client):
         builder = client.entity("Customers")
@@ -218,6 +238,7 @@ class TestQueryBuilderKeyEndpoint:
 # ─────────────────────────────────────────────────────────────────────────────
 # Testes — ODataQueryBuilder (execução via mock)
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestQueryBuilderExecution:
     def test_get_calls_request(self, client, mock_response_customers):
@@ -264,7 +285,9 @@ class TestQueryBuilderExecution:
     def test_patch_calls_patch(self, client):
         client._request = MagicMock(return_value={})
         client.entity("Customers").patch("BRASI", {"ContactName": "João"})
-        client._request.assert_called_once_with("PATCH", "Customers('BRASI')", data={"ContactName": "João"})
+        client._request.assert_called_once_with(
+            "PATCH", "Customers('BRASI')", data={"ContactName": "João"}
+        )
 
     def test_delete_calls_delete(self, client):
         client._request = MagicMock(return_value={})
@@ -283,6 +306,7 @@ class TestQueryBuilderExecution:
 # ─────────────────────────────────────────────────────────────────────────────
 # Testes — ODataAnnotationParser (JSON)
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestODataAnnotationParserJson:
     def test_from_dict_creates_instance(self, mock_metadata_json):
@@ -341,11 +365,11 @@ class TestODataAnnotationParserJson:
     def test_to_ui_config_structure(self, mock_metadata_json):
         parser = ODataAnnotationParser.from_dict(mock_metadata_json)
         config = parser.to_ui_config("Customer")
-        assert "entity"   in config
-        assert "label"    in config
+        assert "entity" in config
+        assert "label" in config
         assert "listView" in config
-        assert "form"     in config
-        assert "columns"  in config["listView"]
+        assert "form" in config
+        assert "columns" in config["listView"]
 
     def test_field_type_mapping(self, mock_metadata_json):
         parser = ODataAnnotationParser.from_dict(mock_metadata_json)
@@ -357,6 +381,7 @@ class TestODataAnnotationParserJson:
 # ─────────────────────────────────────────────────────────────────────────────
 # Testes — Exceções
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 class TestExceptions:
     def test_s2modata_error_message(self):
@@ -394,9 +419,9 @@ class TestExceptions:
 
     def test_client_raises_connection_error(self, client):
         import requests as req
+
         with patch.object(
-            client.session, "request",
-            side_effect=req.exceptions.ConnectionError("refused")
+            client.session, "request", side_effect=req.exceptions.ConnectionError("refused")
         ):
             with pytest.raises(S2MODataConnectionError):
                 client._request("GET", "Customers")

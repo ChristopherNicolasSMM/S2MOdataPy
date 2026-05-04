@@ -8,19 +8,19 @@ Author: Christopher N. S. M. Mauricio
 """
 
 import re
+
 from sqlalchemy import asc, desc
 from sqlalchemy.inspection import inspect as sa_inspect
-
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Filtros ($filter)
 # ─────────────────────────────────────────────────────────────────────────────
 
 # Captura expressões com valor string entre aspas simples: campo op 'valor'
-_PATTERN_STR  = r"(\w+)\s+(eq|ne|gt|ge|lt|le|contains)\s+'([^']*)'"
+_PATTERN_STR = r"(\w+)\s+(eq|ne|gt|ge|lt|le|contains)\s+'([^']*)'"
 
 # Captura expressões com valor numérico sem aspas: campo op 123.45
-_PATTERN_NUM  = r"(\w+)\s+(eq|ne|gt|ge|lt|le)\s+(-?\d+(?:\.\d+)?)"
+_PATTERN_NUM = r"(\w+)\s+(eq|ne|gt|ge|lt|le)\s+(-?\d+(?:\.\d+)?)"
 
 # Captura contains(campo, 'valor')
 _PATTERN_FUNC = r"contains\((\w+)\s*,\s*'([^']*)'\)"
@@ -75,12 +75,12 @@ def apply_odata_filters(query, model, filter_str: str = None):
 def _apply_op(query, column, op: str, value):
     """Aplica um operador de comparação à coluna."""
     ops = {
-        "eq":       column == value,
-        "ne":       column != value,
-        "gt":       column >  value,
-        "ge":       column >= value,
-        "lt":       column <  value,
-        "le":       column <= value,
+        "eq": column == value,
+        "ne": column != value,
+        "gt": column > value,
+        "ge": column >= value,
+        "lt": column < value,
+        "le": column <= value,
         "contains": column.ilike(f"%{value}%"),
     }
     condition = ops.get(op)
@@ -92,6 +92,7 @@ def _apply_op(query, column, op: str, value):
 # ─────────────────────────────────────────────────────────────────────────────
 # Ordenação ($orderby)
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def apply_odata_orderby(query, model, orderby_str: str = None):
     """
@@ -136,6 +137,7 @@ def apply_odata_orderby(query, model, orderby_str: str = None):
 # ─────────────────────────────────────────────────────────────────────────────
 # Paginação ($top / $skip)
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def apply_odata_pagination(query, top: int = None, skip: int = None, default_top: int = 20):
     """

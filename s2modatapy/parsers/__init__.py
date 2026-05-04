@@ -5,13 +5,13 @@ Author: Christopher N. S. M. Mauricio
 """
 
 from .annotations import (
+    FieldType,
     ODataAnnotationParser,
     UIAnnotations,
-    UIListView,
-    UIFieldGroup,
     UIField,
+    UIFieldGroup,
     UIForm,
-    FieldType,
+    UIListView,
 )
 
 __all__ = [

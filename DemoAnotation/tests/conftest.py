@@ -22,6 +22,7 @@ Author: Christopher N. S. M. Mauricio
 
 import os
 import sys
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -53,7 +54,7 @@ except ImportError:
 # ─────────────────────────────────────────────────────────────────────────────
 
 os.environ["ENVIRONMENT"] = "test"
-os.environ["SQLITE_DB"]   = ":memory:"
+os.environ["SQLITE_DB"] = ":memory:"
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Configura um engine SQLite em memória com StaticPool para que TODAS as
@@ -76,8 +77,8 @@ _TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_test_e
 # Importa Base e models para que o SQLAlchemy registre todos os metadados
 from database import Base, get_db  # noqa: E402
 from models.customer import Customer  # noqa: F401, E402
-from models.order    import Order     # noqa: F401, E402
-from models.product  import Product   # noqa: F401, E402
+from models.order import Order  # noqa: F401, E402
+from models.product import Product  # noqa: F401, E402
 
 # Cria as tabelas UMA VEZ no engine compartilhado
 Base.metadata.create_all(bind=_test_engine)
@@ -87,6 +88,7 @@ _seed_done = False
 _seed_db = _TestSessionLocal()
 try:
     from mock_data import load_mock_data
+
     load_mock_data(_seed_db)
     _seed_done = True
 except Exception as e:
@@ -113,6 +115,7 @@ def test_app():
     da base de desenvolvimento e compartilhado entre todos os testes.
     """
     from main import app
+
     app.dependency_overrides[get_db] = _override_get_db
     return app
 

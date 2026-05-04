@@ -3,19 +3,20 @@
 Script Automatizado para Empacotamento da S2MOdataPy
 Autor: Christopher N. S. M. Mauricio
 """
-#Empacotar o projeto usando setuptools
-#python "C:\Users\...\empacotar_s2modatapy.py"
 
-#Subir versão para o PyPI
-#python -m twine upload "C:\Users\...\empacotamento_temp\dist/*"
+# Empacotar o projeto usando setuptools
+# python "C:\Users\...\empacotar_s2modatapy.py"
+
+# Subir versão para o PyPI
+# python -m twine upload "C:\Users\...\empacotamento_temp\dist/*"
 
 import os
-import sys
-import subprocess
-import shutil
 import re
-from pathlib import Path
+import shutil
+import subprocess
+import sys
 import time
+from pathlib import Path
 
 # ==================================================
 # CONFIGURAÇÕES - AJUSTE AQUI SE NECESSÁRIO
@@ -26,59 +27,75 @@ EMAIL_AUTOR = "christopher.nicolas.mauricio@gmail.com"
 GITHUB_URL = "https://github.com/ChristopherNicolasSMM/S2MOdataPy"
 # ==================================================
 
+
 # Cores para terminal (Windows e Unix)
 class Cores:
-    VERDE = '\033[92m'
-    AMARELO = '\033[93m'
-    VERMELHO = '\033[91m'
-    AZUL = '\033[94m'
-    RESET = '\033[0m'
+    VERDE = "\033[92m"
+    AMARELO = "\033[93m"
+    VERMELHO = "\033[91m"
+    AZUL = "\033[94m"
+    RESET = "\033[0m"
+
 
 def print_color(texto, cor=Cores.AZUL):
     print(f"{cor}{texto}{Cores.RESET}")
 
+
 def executar_comando(comando, descricao):
-    
-    
 
     print_color(f"\n📦 {descricao}...", Cores.AZUL)
     try:
         if isinstance(comando, str):
             import shlex
+
             comando = shlex.split(comando)
             env = os.environ.copy()
             env["PYTHONIOENCODING"] = "utf-8"
-            resultado = subprocess.run(comando, check=True, shell=False, text=True, capture_output=True, encoding='utf-8', env=env)            
-        #resultado = subprocess.run(comando, check=True, shell=False, text=True, capture_output=True, encoding='utf-8')
+            resultado = subprocess.run(
+                comando,
+                check=True,
+                shell=False,
+                text=True,
+                capture_output=True,
+                encoding="utf-8",
+                env=env,
+            )
+        # resultado = subprocess.run(comando, check=True, shell=False, text=True, capture_output=True, encoding='utf-8')
         print_color(f"   ✅ Comando executado com sucesso!", Cores.VERDE)
         return True
     except subprocess.CalledProcessError as e:
         print_color(f"   ❌ Erro: {e.stderr if e.stderr else str(e)}", Cores.VERMELHO)
         return False
 
+
 def obter_versao_atual(arquivo_pyproject):
-    with open(arquivo_pyproject, 'r', encoding='utf-8') as f:
+    with open(arquivo_pyproject, "r", encoding="utf-8") as f:
         conteudo = f.read()
     match = re.search(r'version = "([^"]+)"', conteudo)
     return match.group(1) if match else "0.1.0"
 
+
 def incrementar_versao(arquivo_pyproject, tipo="patch"):
     versao_atual = obter_versao_atual(arquivo_pyproject)
-    major, minor, patch = map(int, versao_atual.split('.'))
+    major, minor, patch = map(int, versao_atual.split("."))
     if tipo == "major":
-        major += 1; minor = 0; patch = 0
+        major += 1
+        minor = 0
+        patch = 0
     elif tipo == "minor":
-        minor += 1; patch = 0
+        minor += 1
+        patch = 0
     else:
         patch += 1
     nova_versao = f"{major}.{minor}.{patch}"
-    with open(arquivo_pyproject, 'r', encoding='utf-8') as f:
+    with open(arquivo_pyproject, "r", encoding="utf-8") as f:
         conteudo = f.read()
     novo_conteudo = re.sub(r'version = "[^"]+"', f'version = "{nova_versao}"', conteudo)
-    with open(arquivo_pyproject, 'w', encoding='utf-8') as f:
+    with open(arquivo_pyproject, "w", encoding="utf-8") as f:
         f.write(novo_conteudo)
     print_color(f"   📈 Versão atualizada: {versao_atual} → {nova_versao}", Cores.VERDE)
     return nova_versao
+
 
 def rm_tree(path):
     """Remove diretório com renomeação prévia e retentativas."""
@@ -88,9 +105,11 @@ def rm_tree(path):
     # Tenta renomear a pasta (quebra lock do Explorer)
     try:
         print_color(f"   🔄 Tentando renomear '{path}' para liberar lock...", Cores.AZUL)
-        temp_path = path.with_suffix('.deleteme')
+        temp_path = path.with_suffix(".deleteme")
         if temp_path.exists():
-            print_color(f"   ⚠️  Pasta temporária '{temp_path}' já existe, removendo...", Cores.AMARELO)
+            print_color(
+                f"   ⚠️  Pasta temporária '{temp_path}' já existe, removendo...", Cores.AMARELO
+            )
             shutil.rmtree(temp_path, ignore_errors=True)
         path.rename(temp_path)
         path = temp_path
@@ -104,16 +123,19 @@ def rm_tree(path):
             shutil.rmtree(path, ignore_errors=True)
             return
         except PermissionError:
-            print_color(f"   ⚠️  Permissão negada, esperando e tentando novamente...", Cores.AMARELO)
+            print_color(
+                f"   ⚠️  Permissão negada, esperando e tentando novamente...", Cores.AMARELO
+            )
             time.sleep(0.5)
     # Última tentativa ignorando qualquer erro
     print_color(f"   🗑️  Tentativa final de remoção de '{path}'...", Cores.AZUL)
-    shutil.rmtree(path, ignore_errors=True) 
-        
+    shutil.rmtree(path, ignore_errors=True)
+
+
 def main():
-    print_color("\n" + "="*70, Cores.AZUL)
+    print_color("\n" + "=" * 70, Cores.AZUL)
     print_color(" EMPACOTADOR AUTOMÁTICO - S2MODATAPY ".center(70), Cores.AZUL)
-    print_color("="*70, Cores.AZUL)
+    print_color("=" * 70, Cores.AZUL)
     print_color(f"\n👤 Autor: {AUTOR}", Cores.AMARELO)
     print_color(f"📦 Pacote: {NOME_PACOTE}", Cores.AMARELO)
 
@@ -144,7 +166,7 @@ def main():
         versao_atual = obter_versao_atual(arquivo_pyproject)
         print_color(f"   Versão atual: {versao_atual}", Cores.AMARELO)
         resposta = input("   Incrementar versão? (patch/minor/major/N): ").lower()
-        if resposta in ['patch','minor','major']:
+        if resposta in ["patch", "minor", "major"]:
             incrementar_versao(arquivo_pyproject, resposta)
         else:
             print_color("   ℹ️  Mantendo versão atual.", Cores.AMARELO)
@@ -182,7 +204,9 @@ def main():
     python_exe = sys.executable
 
     # Instalar build (se necessário)
-    if executar_comando([python_exe, "-m", "pip", "install", "--upgrade", "build"], "Instalando build"):
+    if executar_comando(
+        [python_exe, "-m", "pip", "install", "--upgrade", "build"], "Instalando build"
+    ):
         # Muda para a pasta temporária
         os.chdir(pasta_temp)
         print_color(f"   Diretório de build: {os.getcwd()}", Cores.AMARELO)
@@ -203,42 +227,45 @@ def main():
 
         print_color(f"\n   📦 Arquivos gerados em: {dist_dir}", Cores.AMARELO)
         for arquivo in dist_dir.iterdir():
-            print_color(f"      - {arquivo.name} ({arquivo.stat().st_size/1024:.1f} KB)", Cores.VERDE)
-
-
+            print_color(
+                f"      - {arquivo.name} ({arquivo.stat().st_size/1024:.1f} KB)", Cores.VERDE
+            )
 
     # 8. Upload para TestPyPI (opcional)
     resposta = input("\n☁️  Deseja fazer upload para o TestPyPI? (s/N): ").lower()
-    if resposta in ['s','sim','y','yes']:
-        executar_comando([python_exe, "-m", "pip", "install", "--upgrade", "twine"], "Instalando twine")
+    if resposta in ["s", "sim", "y", "yes"]:
+        executar_comando(
+            [python_exe, "-m", "pip", "install", "--upgrade", "twine"], "Instalando twine"
+        )
         resposta2 = input("   Continuar com upload? (s/N): ").lower()
-        if resposta2 in ['s','sim','y','yes']:
-            
-            dist_dir = pasta_temp / "dist"
-            #executar_comando([python_exe, "-m", "twine", "upload", "--repository", "testpypi", str(dist_dir / "*")], "Upload para TestPyPI")
+        if resposta2 in ["s", "sim", "y", "yes"]:
 
-            arquivos = [str(p) for p in dist_dir.glob("*") if p.suffix in ('.whl', '.tar.gz')]
+            dist_dir = pasta_temp / "dist"
+            # executar_comando([python_exe, "-m", "twine", "upload", "--repository", "testpypi", str(dist_dir / "*")], "Upload para TestPyPI")
+
+            arquivos = [str(p) for p in dist_dir.glob("*") if p.suffix in (".whl", ".tar.gz")]
             if arquivos:
-                executar_comando([python_exe, "-m", "twine", "upload", "--repository", "testpypi"] + arquivos, "Upload para TestPyPI")   
-                         
+                executar_comando(
+                    [python_exe, "-m", "twine", "upload", "--repository", "testpypi"] + arquivos,
+                    "Upload para TestPyPI",
+                )
 
     # Finalização
-    print_color("\n" + "="*70, Cores.VERDE)
+    print_color("\n" + "=" * 70, Cores.VERDE)
     print_color(" 🎉 EMPACOTAMENTO CONCLUÍDO! ".center(70), Cores.VERDE)
-    print_color("="*70, Cores.VERDE)
+    print_color("=" * 70, Cores.VERDE)
     print_color(f"\n📁 Pasta do pacote: {pasta_temp}", Cores.AMARELO)
     print_color(f"📦 Arquivos: {pasta_temp / 'dist'}", Cores.AMARELO)
     print_color("\n🚀 Para publicar no PyPI oficial:")
     print_color(f"   python -m twine upload {pasta_temp / 'dist'}/*", Cores.VERDE)
 
     resposta_clean = input("\n   Deseja limpar a pasta temporária? (s/N): ").lower()
-    if resposta_clean in ['s','sim','y','yes']:
+    if resposta_clean in ["s", "sim", "y", "yes"]:
         rm_tree(pasta_temp)
-        #shutil.rmtree(pasta_temp, ignore_errors=True)     
-        
+        # shutil.rmtree(pasta_temp, ignore_errors=True)
+
         print_color("   ✅ Pasta removida.", Cores.VERDE)
-        
-    
+
 
 if __name__ == "__main__":
     main()
